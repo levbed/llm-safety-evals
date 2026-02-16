@@ -201,6 +201,12 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Eval artifacts
+outputs/
+
+# macOS Finder metadata
+.DS_Store
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
