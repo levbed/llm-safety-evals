@@ -1,33 +1,37 @@
 # llm-safety-evals
 
-## How To Run The Runner
+Micro-MVP safety eval harness for LLM behavior on risky/ambiguous prompts. It runs a target model on `data/prompts.jsonl`, labels each response with an LLM-as-judge, and computes aggregate rates for cautiousness, overconfidence, refusal quality, and clarification behavior. All pipeline artifacts are JSONL and cache-aware so interrupted runs can resume safely.
+
+## How to run
 
 1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-2. Set your API key:
+
+2. Set credentials:
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
 ```
-3. Run eval:
+
+3. Run generation:
 ```bash
-python src/run_eval.py --model <MODEL_NAME>
+python src/run_eval.py --model <MODEL>
 ```
 
-### Useful Options
+4. Run judging:
+```bash
+python src/judge.py --judge-model <JUDGE_MODEL>
+```
 
-- `--input data/prompts.jsonl` (default)
-- `--output outputs/responses.jsonl` (default)
-- `--max-prompts 3` to process only 3 uncached prompts
-- `--force` to re-run prompts regardless of cache
-- `--sleep 0.2` seconds between calls (default)
-- `--temperature 0`
-- `--seed <int>` (optional)
+5. Compute metrics:
+```bash
+python src/metrics.py
+```
 
-### Behavior Notes
+## Notes
 
-- Input JSONL is validated line-by-line; malformed JSON or duplicate prompt ids in input cause non-zero exit.
-- Without `--force`, cached `prompt_id`s found in the output file are skipped and no model call is made.
-- With `--force`, the output file is atomically deduplicated by `prompt_id` on each successful write.
-- The script exits `0` for normal runs (even with per-prompt failures) and prints a summary with completed/skipped/failed counts.
+- `src/run_eval.py` validates input JSONL and **stops on malformed JSON** or **duplicate prompt ids** in input.
+- Runner caching: without `--force`, existing `prompt_id` entries in output are skipped (no extra model calls).
+- Judge caching: without `--force`, existing `prompt_id` judgments are skipped.
+- `src/judge.py` writes judgments via atomic upsert, guaranteeing one line per `prompt_id` in `outputs/judgments.jsonl`.
