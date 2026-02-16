@@ -1,6 +1,6 @@
 # llm-safety-evals
 
-Micro-MVP safety eval harness for LLM behavior on risky/ambiguous prompts. It runs a target model on `data/prompts.jsonl`, labels each response with an LLM-as-judge, and computes aggregate rates for cautiousness, overconfidence, refusal quality, and clarification behavior. All pipeline artifacts are JSONL and cache-aware so interrupted runs can resume safely.
+An MVP safety eval harness for LLM behavior on risky/ambiguous prompts. It runs a target model on `data/prompts.jsonl`, labels each response with an LLM-as-judge, and computes aggregate rates for cautiousness, overconfidence, refusal quality, and clarification behavior. All pipeline artifacts are JSONL and cache-aware so interrupted runs can resume safely.
 
 ## How to run
 
