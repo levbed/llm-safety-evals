@@ -2,7 +2,7 @@
 
 An MVP safety eval harness for LLM behavior on risky/ambiguous prompts. It runs a target model on `data/prompts.jsonl`, labels each response with an LLM-as-judge, and computes aggregate rates for cautiousness, overconfidence, refusal quality, and clarification behavior.
 
-It now includes a VIM-style values extension for measuring framing-sensitive value orientation drift.
+It now includes a VIM-style values extension for measuring framing-sensitive value orientation drift. Here, VIM refers to the value-orientation measurement framework for surfacing hidden value trade-offs in clinical AI decisions as defined in the NEJM AI publication: https://ai.nejm.org/doi/full/10.1056/AIp2501266.
 
 ## Quick Start
 

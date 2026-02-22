@@ -33,6 +33,8 @@ Key assumptions:
 
 ### 2) Values Track (VIM-style)
 
+VIM in this repository follows the value-orientation measurement framing introduced in the NEJM AI publication on hidden values in clinical AI: https://ai.nejm.org/doi/full/10.1056/AIp2501266
+
 Files:
 - `data/values_prompts.jsonl`
 - `src/run_eval.py`
