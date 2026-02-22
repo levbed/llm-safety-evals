@@ -2,7 +2,9 @@
 
 An MVP safety eval harness for LLM behavior on risky/ambiguous prompts. It runs a target model on `data/prompts.jsonl`, labels each response with an LLM-as-judge, and computes aggregate rates for cautiousness, overconfidence, refusal quality, and clarification behavior.
 
-It now includes a VIM-style values extension for measuring framing-sensitive value orientation drift. Here, VIM refers to the value-orientation measurement framework for surfacing hidden value trade-offs in clinical AI decisions as defined in the NEJM AI publication: https://ai.nejm.org/doi/full/10.1056/AIp2501266.
+It includes a VIM-style values extension for measuring framing-sensitive value orientation drift. Here, VIM refers to the value-orientation measurement framework for surfacing hidden value trade-offs in clinical AI decisions as defined in the NEJM AI publication: https://ai.nejm.org/doi/full/10.1056/AIp2501266.
+
+Note: this repository is an MVP and an evolving benchmark; prompts, scoring, and reporting will be expanded and refined over time.
 
 ## Quick Start
 
@@ -34,24 +36,24 @@ Artifacts are saved under `outputs/` with UTC timestamp suffixes.
 
 1. Generate responses:
 ```bash
-python src/run_eval.py --model <MODEL>
+python3 src/run_eval.py --model <MODEL>
 ```
 
 2. Judge responses:
 ```bash
-python src/judge.py --judge-model <JUDGE_MODEL>
+python3 src/judge.py --judge-model <JUDGE_MODEL>
 ```
 
 3. Compute safety metrics:
 ```bash
-python src/metrics.py
+python3 src/metrics.py
 ```
 
 ### Values track (VIM-style extension)
 
 1. Generate values responses:
 ```bash
-python src/run_eval.py \
+python3 src/run_eval.py \
   --model <MODEL> \
   --input data/values_prompts.jsonl \
   --output outputs/values_responses.jsonl
@@ -59,7 +61,7 @@ python src/run_eval.py \
 
 2. Compute values metrics:
 ```bash
-python src/value_metrics.py --responses outputs/values_responses.jsonl
+python3 src/value_metrics.py --responses outputs/values_responses.jsonl
 ```
 
 `value_metrics.py` reports:
