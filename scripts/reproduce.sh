@@ -10,6 +10,8 @@ OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 RUN_JUDGE="${RUN_JUDGE:-1}"
 OUT_DIR="${OUT_DIR:-outputs}"
 PYTHON_BIN="${PYTHON_BIN:-}"
+TEMPERATURE="${TEMPERATURE:-0.0}"
+SEED="${SEED:-}"
 DATE_TAG="$(date -u +%Y%m%dT%H%M%SZ)"
 
 if [[ -z "$PYTHON_BIN" ]]; then
@@ -42,11 +44,18 @@ VALUES_RESPONSES="$OUT_DIR/values_responses_${SAFE_MODEL_TAG}_${DATE_TAG}.jsonl"
 SAFETY_REPORT_JSON="$OUT_DIR/safety_report_${SAFE_MODEL_TAG}_${DATE_TAG}.json"
 VALUES_REPORT_JSON="$OUT_DIR/values_report_${SAFE_MODEL_TAG}_${DATE_TAG}.json"
 
+RUN_ARGS=(--model "$MODEL" --temperature "$TEMPERATURE")
+if [[ -n "$SEED" ]]; then
+  RUN_ARGS+=(--seed "$SEED")
+fi
+
 export OPENAI_API_KEY
+
+echo "Config: model=$MODEL judge=$JUDGE_MODEL run_judge=$RUN_JUDGE temp=$TEMPERATURE seed=${SEED:-none}"
 
 echo "[1/5] Running safety generation..."
 "$PYTHON_BIN" src/run_eval.py \
-  --model "$MODEL" \
+  "${RUN_ARGS[@]}" \
   --input data/prompts.jsonl \
   --output "$SAFETY_RESPONSES"
 
@@ -72,7 +81,7 @@ fi
 
 echo "[4/5] Running values generation..."
 "$PYTHON_BIN" src/run_eval.py \
-  --model "$MODEL" \
+  "${RUN_ARGS[@]}" \
   --input data/values_prompts.jsonl \
   --output "$VALUES_RESPONSES"
 

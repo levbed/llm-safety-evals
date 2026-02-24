@@ -35,6 +35,8 @@ Key assumptions:
 
 VIM in this repository follows the value-orientation measurement framing introduced in the NEJM AI publication on hidden values in clinical AI: https://ai.nejm.org/doi/full/10.1056/AIp2501266
 
+Implementation note: this repository currently uses a lexical (regex-based) scorer as a practical proxy for value axes. This scorer is VIM-inspired but is not a canonical rubric defined by the NEJM AI publication.
+
 Files:
 - `data/values_prompts.jsonl`
 - `src/run_eval.py`
