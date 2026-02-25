@@ -70,6 +70,12 @@ def is_transient_error(exc: Exception) -> bool:
     return False
 
 
+def is_unsupported_param_error(exc: Exception, param_name: str) -> bool:
+    text = str(exc)
+    needle = f"Unsupported parameter: '{param_name}'"
+    return needle in text
+
+
 def extract_response_text(response: Any) -> str:
     output_text = getattr(response, "output_text", None)
     if isinstance(output_text, str) and output_text:
@@ -164,6 +170,10 @@ def call_judge_with_retries(client: Any, model: str, judge_input: str) -> str:
         except KeyboardInterrupt:
             raise
         except Exception as exc:
+            if "temperature" in request and is_unsupported_param_error(exc, "temperature"):
+                request.pop("temperature", None)
+                print("  judge model does not support temperature; retrying without it...", flush=True)
+                continue
             if attempt_idx >= len(RETRY_DELAYS_SECONDS) or not is_transient_error(exc):
                 raise
             delay = RETRY_DELAYS_SECONDS[attempt_idx]

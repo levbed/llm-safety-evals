@@ -229,6 +229,12 @@ def is_transient_error(exc: Exception) -> bool:
     return False
 
 
+def is_unsupported_param_error(exc: Exception, param_name: str) -> bool:
+    text = str(exc)
+    needle = f"Unsupported parameter: '{param_name}'"
+    return needle in text
+
+
 def call_model_with_retries(
     client: Any,
     model: str,
@@ -251,6 +257,14 @@ def call_model_with_retries(
         except KeyboardInterrupt:
             raise
         except Exception as exc:
+            if "temperature" in request and is_unsupported_param_error(exc, "temperature"):
+                request.pop("temperature", None)
+                print("  model does not support temperature; retrying without it...", flush=True)
+                continue
+            if "seed" in request and is_unsupported_param_error(exc, "seed"):
+                request.pop("seed", None)
+                print("  model does not support seed; retrying without it...", flush=True)
+                continue
             if attempt_idx >= len(RETRY_DELAYS_SECONDS) or not is_transient_error(exc):
                 raise
             delay = RETRY_DELAYS_SECONDS[attempt_idx]

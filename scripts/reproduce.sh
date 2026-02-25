@@ -12,6 +12,7 @@ OUT_DIR="${OUT_DIR:-outputs}"
 PYTHON_BIN="${PYTHON_BIN:-}"
 TEMPERATURE="${TEMPERATURE:-0.0}"
 SEED="${SEED:-}"
+JUDGE_MODEL_PIN_FILE="${JUDGE_MODEL_PIN_FILE:-configs/judge_model.txt}"
 DATE_TAG="$(date -u +%Y%m%dT%H%M%SZ)"
 
 if [[ -z "$PYTHON_BIN" ]]; then
@@ -37,6 +38,11 @@ fi
 
 mkdir -p "$OUT_DIR"
 
+FIXED_JUDGE_MODEL=""
+if [[ -f "$JUDGE_MODEL_PIN_FILE" ]]; then
+  FIXED_JUDGE_MODEL="$(grep -Ev '^\s*($|#)' "$JUDGE_MODEL_PIN_FILE" | head -n 1 | tr -d '[:space:]')"
+fi
+
 SAFE_MODEL_TAG="${MODEL//\//_}"
 SAFETY_RESPONSES="$OUT_DIR/responses_${SAFE_MODEL_TAG}_${DATE_TAG}.jsonl"
 SAFETY_JUDGMENTS="$OUT_DIR/judgments_${SAFE_MODEL_TAG}_${DATE_TAG}.jsonl"
@@ -51,7 +57,24 @@ fi
 
 export OPENAI_API_KEY
 
-echo "Config: model=$MODEL judge=$JUDGE_MODEL run_judge=$RUN_JUDGE temp=$TEMPERATURE seed=${SEED:-none}"
+if [[ "$RUN_JUDGE" == "1" ]]; then
+  if [[ -n "$FIXED_JUDGE_MODEL" ]]; then
+    if [[ -z "$JUDGE_MODEL" ]]; then
+      JUDGE_MODEL="$FIXED_JUDGE_MODEL"
+    elif [[ "$JUDGE_MODEL" != "$FIXED_JUDGE_MODEL" ]]; then
+      echo "Error: JUDGE_MODEL ($JUDGE_MODEL) differs from fixed judge model ($FIXED_JUDGE_MODEL)." >&2
+      echo "To keep evaluations comparable, use the fixed judge or update $JUDGE_MODEL_PIN_FILE intentionally." >&2
+      exit 1
+    fi
+  fi
+
+  if [[ -z "$JUDGE_MODEL" ]]; then
+    echo "Error: JUDGE_MODEL is required when RUN_JUDGE=1." >&2
+    exit 1
+  fi
+fi
+
+echo "Config: model=$MODEL judge=${JUDGE_MODEL:-none} fixed_judge=${FIXED_JUDGE_MODEL:-none} run_judge=$RUN_JUDGE temp=$TEMPERATURE seed=${SEED:-none}"
 
 echo "[1/5] Running safety generation..."
 "$PYTHON_BIN" src/run_eval.py \
@@ -60,10 +83,6 @@ echo "[1/5] Running safety generation..."
   --output "$SAFETY_RESPONSES"
 
 if [[ "$RUN_JUDGE" == "1" ]]; then
-  if [[ -z "$JUDGE_MODEL" ]]; then
-    echo "Error: JUDGE_MODEL is required when RUN_JUDGE=1." >&2
-    exit 1
-  fi
   echo "[2/5] Running safety judge..."
   "$PYTHON_BIN" src/judge.py \
     --judge-model "$JUDGE_MODEL" \

@@ -36,6 +36,11 @@ Reproducibility knobs:
 - `TEMPERATURE` (default `0.0`)
 - `SEED` (optional, forwarded to `run_eval.py`)
 
+Judge model pinning for fair comparisons:
+- `scripts/reproduce.sh` reads fixed judge model from `configs/judge_model.txt`.
+- If `RUN_JUDGE=1`, passing a different `JUDGE_MODEL` will fail by design.
+- Update `configs/judge_model.txt` intentionally when you want to change the canonical judge.
+
 ## Manual Run
 
 ### Safety track
