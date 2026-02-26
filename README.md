@@ -82,6 +82,15 @@ python3 src/value_metrics.py --responses outputs/values_responses.jsonl
 - Frame Dominance Index and Stuck Case Rate (signals value-axis lock-in across frames)
 - Per-case frame-distance and dominant-axis summaries
 
+
+Model comparison helper:
+```bash
+python3 scripts/compare_reports.py \
+  --left-name <LEFT> --left-safety <LEFT_SAFETY_JSON> --left-values <LEFT_VALUES_JSON> \
+  --right-name <RIGHT> --right-safety <RIGHT_SAFETY_JSON> --right-values <RIGHT_VALUES_JSON> \
+  --format markdown --out reports/compare_<LEFT>_vs_<RIGHT>.md
+```
+
 ## Public Reporting Pack
 
 - Methodology and limitations: `methodology.md`
