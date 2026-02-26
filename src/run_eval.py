@@ -231,8 +231,11 @@ def is_transient_error(exc: Exception) -> bool:
 
 def is_unsupported_param_error(exc: Exception, param_name: str) -> bool:
     text = str(exc)
-    needle = f"Unsupported parameter: '{param_name}'"
-    return needle in text
+    needles = (
+        f"Unsupported parameter: '{param_name}'",
+        f"unexpected keyword argument '{param_name}'",
+    )
+    return any(needle in text for needle in needles)
 
 
 def call_model_with_retries(
